@@ -78,6 +78,8 @@ public final class ExprBinary extends Expr {
         this.right = right;
     }
 
+
+
     // ============================================================================================================//
 
     /**
@@ -769,4 +771,13 @@ public final class ExprBinary extends Expr {
     public List< ? extends Browsable> getSubnodes() {
         return Util.asList(left, right);
     }
+
+    // allcall
+    public ExprBinary(ExprBinary x, Expr left, Expr right) {
+        super(x);
+        this.op = x.op;
+        this.left = left;
+        this.right = right;
+    }
+
 }

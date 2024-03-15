@@ -170,6 +170,7 @@ public final class ExprQt extends Expr {
      * This class contains all possible quantification operators.
      */
     public enum Op {
+
                     /** all a,b:x | formula */
                     ALL("all"),
                     /** no a,b:x | formula */
@@ -384,4 +385,14 @@ public final class ExprQt extends Expr {
         ans.add(make(sub.span(), sub.span(), "<b>body</b>", sub));
         return ans;
     }
+
+    // allcall
+
+    public ExprQt(ExprQt x, Op op, List<Decl> decls, Expr sub) {
+        super(x);
+        this.op = op;
+        this.decls = ConstList.make(decls);
+        this.sub = sub;
+    }
+
 }

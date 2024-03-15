@@ -124,4 +124,11 @@ public final class ExprBadJoin extends Expr {
     public List< ? extends Browsable> getSubnodes() {
         return new ArrayList<Browsable>(0);
     }
+
+    // allcall
+    public ExprBadJoin(ExprBadJoin x, Expr left, Expr right, JoinableList<Err> errors) {
+        this(x.pos, x.closingBracket, left, right, errors);
+    }
+
+
 }

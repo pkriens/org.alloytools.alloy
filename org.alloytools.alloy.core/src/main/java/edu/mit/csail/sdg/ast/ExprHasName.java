@@ -55,4 +55,11 @@ public abstract class ExprHasName extends Expr {
     public final int getDepth() {
         return 1;
     }
+
+    // allcall
+    public ExprHasName(ExprHasName x, String label) {
+        super(x);
+        this.label = label;
+    }
+
 }

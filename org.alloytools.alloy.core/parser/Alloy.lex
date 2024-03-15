@@ -232,6 +232,14 @@ import java_cup.runtime.*;
 "'"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "‘"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
 "’"                   { return alloy_sym(yytext(), CompSym.PRIME       );}
+"algorithm"           { return alloy_sym(yytext(), CompSym.ALGORITHM   );} // pkriens
+"while"               { return alloy_sym(yytext(), CompSym.WHILE       );} // pkriens
+"skip"                { return alloy_sym(yytext(), CompSym.SKIP        );} // pkriens
+"goto"                { return alloy_sym(yytext(), CompSym.GOTO        );} // pkriens
+"with"                { return alloy_sym(yytext(), CompSym.WITH        );} // pkriens
+"if"                  { return alloy_sym(yytext(), CompSym.IF          );} // pkriens
+":="                  { return alloy_sym(yytext(), CompSym.ASSIGN      );} // pkriens
+"require"             { return alloy_sym(yytext(), CompSym.REQUIRE      );} // pkriens
 
 [\"] ([^\\\"] | ("\\" .))* [\"] [\$0-9a-zA-Z_\"] [\$0-9a-zA-Z_\"]* 	   { throw new ErrorSyntax(alloy_here(yytext()),"String literal cannot be followed by a legal identifier character."); }
 [\"] ([^\\\"] | ("\\" .))* [\"]                                        { return alloy_string(yytext()); }

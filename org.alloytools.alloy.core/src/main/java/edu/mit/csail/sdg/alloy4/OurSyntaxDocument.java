@@ -184,6 +184,8 @@ class OurSyntaxDocument extends DefaultStyledDocument {
      */
     private static final String[]     keywords = new String[] {
                                                                "abstract", "var", "all", "and", "as", "assert", "but", "check", "disj", "else", "enum", "exactly", "expect", "extends", "fact", "for", "fun", "iden", "iff", "implies", "in", "Int", "int", "let", "lone", "module", "no", "none", "not", "one", "open", "or", "pred", "private", "run", "seq", "set", "sig", "some", "String", "sum", "this", "univ", "eventually", "always", "after", "once", "historically", "since", "triggered", "before", "until", "releases", "steps"
+                                                               //
+                                                               , "algorithm", "while", "if", "require", "skip"
     };
 
     /**

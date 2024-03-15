@@ -352,4 +352,12 @@ public final class ExprList extends Expr {
     public List< ? extends Browsable> getSubnodes() {
         return args;
     }
+
+    // allcall
+    public ExprList(ExprList x, Collection<Expr> args) {
+        super(x);
+        this.op = x.op;
+        this.args = ConstList.make(args);
+    }
+
 }

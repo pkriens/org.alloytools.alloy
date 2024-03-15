@@ -1,0 +1,28 @@
+enum boolean { false, true }
+
+sig Process {
+    var b : boolean
+}
+algorithm fastmutex[ var x, y : Int, var b : set Process ] : Process {
+
+    ncs:    skip
+    start:  b := b + p
+       l1:  x := p
+       l2:  if ( y != 0 ) {
+              l3: b := b-p
+              l4: await y = 0
+                  goto start
+            }
+       l5:  y := p
+       l6:  if (x != p) {
+              l7: b := b - p
+              l8: await no b
+              l9: if ( y := p ) {
+                    l10: await y = 0
+                         goto start
+                  }
+              cs: skip
+             l11: y := 0
+             l12: b := b - p
+            }  
+}

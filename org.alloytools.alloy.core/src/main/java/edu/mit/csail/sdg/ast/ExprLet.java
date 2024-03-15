@@ -160,4 +160,14 @@ public final class ExprLet extends Expr {
         Browsable b = make(sub.span(), sub.span(), "<b>where...</b>", sub);
         return Util.asList(a, b);
     }
+
+    // allcall
+    public ExprLet(ExprLet x, ExprVar var, Expr expr, Expr sub) {
+        super(x);
+        this.var = var;
+        this.expr = expr;
+        this.sub = sub;
+    }
+
+
 }

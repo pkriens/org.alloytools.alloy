@@ -1441,4 +1441,19 @@ public abstract class Expr extends Browsable {
     public Clause referenced() {
         return referenced;
     }
+
+    // allcall
+    public Expr(Expr x) {
+        this.pos = x.pos;
+        this.ambiguous = x.ambiguous;
+        this.closingBracket = x.closingBracket;
+        this.errors = x.errors;
+        this.mult = x.mult;
+        this.referenced = x.referenced;
+        this.type = x.type;
+        this.weight = x.weight;
+    }
+
+
+
 }

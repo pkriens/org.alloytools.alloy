@@ -1530,7 +1530,7 @@ public final class CompModule extends Browsable implements Module {
     }
 
     /** Add an enumeration. */
-    void addEnum(Pos pos, Pos priv, ExprVar name, List<ExprVar> atoms, Pos closingBracket) throws Err {
+    public void addEnum(Pos pos, Pos priv, ExprVar name, List<ExprVar> atoms, Pos closingBracket) throws Err {
         ExprVar EXTENDS = ExprVar.make(null, "extends");
         ExprVar THIS = ExprVar.make(null, "this/" + name);
         List<ExprVar> THESE = Arrays.asList(THIS);
@@ -1643,6 +1643,7 @@ public final class CompModule extends Browsable implements Module {
     }
 
     /** Add a FUN or PRED declaration. */
+
     void addFunc(Pos p, Pos isPrivate, ExprVar n, Expr f, List<Decl> decls, Expr t, Expr v) throws Err {
         if (decls == null)
             decls = new ArrayList<Decl>();
@@ -1791,7 +1792,7 @@ public final class CompModule extends Browsable implements Module {
     // ============================================================================================================================//
 
     /** Add an ASSERT declaration. */
-    String addAssertion(Pos pos, Pos labelPos, String name, Expr value) throws Err {
+    public String addAssertion(Pos pos, Pos labelPos, String name, Expr value) throws Err {
         status = 3;
         if (name == null || name.length() == 0)
             name = "assert$" + (1 + asserts.size());
@@ -2718,4 +2719,95 @@ public final class CompModule extends Browsable implements Module {
         return "module " + moduleName;
     }
 
+    // <allcall>
+
+    public List<Decl> getFields(Sig sig) {
+        return old2fields.getOrDefault(sig, Collections.emptyList());
+    }
+
+    public Sig addSig(String name, ExprVar par, List<ExprVar> parents, List<Decl> fields, Expr fact, Attr... attributes) throws Err {
+        Sig obj;
+        Pos pos = Pos.UNKNOWN.merge(WHERE.find(attributes));
+        status = 3;
+        dup(pos, name, true);
+        String full = (path.length() == 0) ? "this/" + name : path + "/" + name;
+        Pos subset = null, subsig = null;
+        boolean exact = false;
+        if (par != null) {
+            if (par.label.equals("extends")) {
+                subsig = par.span().merge(parents.get(0).span());
+            } else {
+                exact = !par.label.equals("in");
+                subset = par.span();
+                for (ExprVar p : parents)
+                    subset = p.span().merge(subset);
+            }
+        }
+        attributes = Util.append(attributes, exact ? Attr.EXACT : null);
+        if (subset != null) {
+            attributes = Util.append(attributes, SUBSET.makenull(subset));
+            List<Sig> newParents = new ArrayList<Sig>(parents == null ? 0 : parents.size());
+            if (parents != null)
+                for (ExprVar p : parents)
+                    newParents.add(new PrimSig(p.label, WHERE.make(p.pos)));
+            obj = new SubsetSig(Pos.UNKNOWN, full, null, newParents, attributes);
+        } else {
+            attributes = Util.append(attributes, SUBSIG.makenull(subsig));
+            PrimSig newParent = (parents != null && parents.size() > 0) ? (new PrimSig(parents.get(0).label, WHERE.make(parents.get(0).pos))) : UNIV;
+            obj = new PrimSig(Pos.UNKNOWN, full, Pos.UNKNOWN, newParent, attributes);
+        }
+        sigs.put(name, obj);
+        old2fields.put(obj, fields);
+        old2appendedfacts.put(obj, fact);
+        return obj;
+    }
+
+    public void addFunc(Pos p, Pos isPrivate, String n, Expr f, List<Decl> decls, Expr t, Expr v) throws Err {
+        if (decls == null)
+            decls = new ArrayList<Decl>();
+        else
+            decls = new ArrayList<Decl>(decls);
+        if (f != null)
+            decls.add(0, new Decl(null, null, null, null, Util.asList(ExprVar.make(f.span(), "this")), f)); // [HASLab]
+        for (Decl d : decls) {
+            if (d.isPrivate != null) {
+                ExprHasName name = d.names.get(0);
+                throw new ErrorSyntax(d.isPrivate.merge(name.pos), "Function parameter \"" + name.label + "\" is always private already.");
+            }
+            if (d.disjoint2 != null) {
+                ExprHasName name = d.names.get(d.names.size() - 1);
+                throw new ErrorSyntax(d.disjoint2.merge(name.pos), "Function parameter \"" + name.label + "\" cannot be bound to a 'disjoint' expression.");
+            }
+        }
+        status = 3;
+        dup(p, n, false);
+        ExprHasName dup = Decl.findDuplicateName(decls);
+        if (dup != null)
+            throw new ErrorSyntax(dup.span(), "The parameter name \"" + dup.label + "\" cannot appear more than once.");
+        Func ans = new Func(p, isPrivate, n, decls, t, v);
+        ArrayList<Func> list = funcs.get(n);
+        if (list == null) {
+            list = new ArrayList<Func>();
+            funcs.put(n, list);
+        }
+        list.add(ans);
+    }
+
+    public Sig getSig(String sig) {
+        return sigs.get(sig);
+    }
+
+    public Expr resolve(Sig sig, Expr expr) {
+        List<ErrorWarning> warnings = new ArrayList<>();
+        Context context = new Context(this, warnings);
+        context.rootsig = sig;
+        Expr formula;
+        if (sig.isOne == null) {
+            context.put("this", sig.decl.get());
+            return context.check(expr).resolve_as_formula(warnings);
+        } else {
+            context.put("this", sig);
+            return context.check(expr).resolve_as_formula(warnings);
+        }
+    }
 }

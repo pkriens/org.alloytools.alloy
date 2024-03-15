@@ -204,4 +204,14 @@ public final class ExprITE extends Expr {
     public List< ? extends Browsable> getSubnodes() {
         return Util.asList(cond, left, right);
     }
+
+    // allcall
+    public ExprITE(ExprITE x, Expr cond, Expr left, Expr right) {
+        super(x);
+        this.cond = cond;
+        this.left = left;
+        this.right = right;
+    }
+
+
 }

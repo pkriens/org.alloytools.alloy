@@ -103,4 +103,11 @@ public final class ExprVar extends ExprHasName implements Clause {
     public String explain() {
         return Util.tailThis(type.explain()) + " : " + label;
     }
+
+    // allcall
+    public ExprVar(ExprVar x) {
+        super(x, x.label);
+    }
+
+
 }

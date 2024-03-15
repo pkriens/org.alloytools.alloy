@@ -155,6 +155,7 @@ public final class ExprUnary extends Expr {
 
     /** This class contains all possible unary operators. */
     public enum Op {
+
                     /** :some x (where x is a unary set) */
                     SOMEOF("some of"),
                     /** :lone x (where x is a unary set) */
@@ -545,4 +546,13 @@ public final class ExprUnary extends Expr {
         } else
             return super.referenced();
     }
+
+    // allcall
+    public ExprUnary(ExprUnary x, Op op, Expr sub) {
+        super(x);
+        this.op = op;
+        this.sub = sub;
+    }
+
+
 }

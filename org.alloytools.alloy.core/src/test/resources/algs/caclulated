@@ -1,0 +1,321 @@
+pred incr.sta{
+     NOOP (
+         AND (
+             in (
+                 -> (
+                     JOIN!
+                         this
+                         p
+                     sta
+                 )
+                 JOIN!
+                     this
+                     pc
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         total
+                     )
+                 JOIN!
+                     JOIN!
+                         this
+                         p
+                     reg
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         pc
+                     )
+                 ++ (
+                     JOIN!
+                         this
+                         pc
+                     -> (
+                         JOIN!
+                             this
+                             p
+                         Done
+                     )
+                 )
+             )
+             = (
+                 ' (
+                     reg
+                 )
+                 reg
+             )
+         )
+     )
+}
+pred incr.Done{
+     NOOP (
+         AND (
+             in (
+                 -> (
+                     JOIN!
+                         this
+                         p
+                     Done
+                 )
+                 JOIN!
+                     this
+                     pc
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         total
+                     )
+                 JOIN!
+                     this
+                     total
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         pc
+                     )
+                 JOIN!
+                     this
+                     pc
+             )
+             = (
+                 ' (
+                     reg
+                 )
+                 reg
+             )
+         )
+     )
+}
+pred incr.lda{
+     NOOP (
+         AND (
+             in (
+                 -> (
+                     JOIN!
+                         this
+                         p
+                     lda
+                 )
+                 JOIN!
+                     this
+                     pc
+             )
+             = (
+                 JOIN!
+                     JOIN!
+                         this
+                         p
+                     ' (
+                         reg
+                     )
+                 JOIN!
+                     this
+                     total
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         pc
+                     )
+                 ++ (
+                     JOIN!
+                         this
+                         pc
+                     -> (
+                         JOIN!
+                             this
+                             p
+                         inc
+                     )
+                 )
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         total
+                     )
+                 JOIN!
+                     this
+                     total
+             )
+             = (
+                 JOIN!
+                     - (
+                         Process
+                         JOIN!
+                             this
+                             p
+                     )
+                     ' (
+                         reg
+                     )
+                 JOIN!
+                     - (
+                         Process
+                         JOIN!
+                             this
+                             p
+                     )
+                     reg
+             )
+         )
+     )
+}
+pred incr.inc{
+     NOOP (
+         AND (
+             in (
+                 -> (
+                     JOIN!
+                         this
+                         p
+                     inc
+                 )
+                 JOIN!
+                     this
+                     pc
+             )
+             = (
+                 JOIN!
+                     JOIN!
+                         this
+                         p
+                     ' (
+                         reg
+                     )
+                 JOIN!
+                     CONST 1
+                     JOIN!
+                         JOIN!
+                             JOIN!
+                                 this
+                                 p
+                             reg
+                         plus
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         pc
+                     )
+                 ++ (
+                     JOIN!
+                         this
+                         pc
+                     -> (
+                         JOIN!
+                             this
+                             p
+                         sta
+                     )
+                 )
+             )
+             = (
+                 JOIN!
+                     this
+                     ' (
+                         total
+                     )
+                 JOIN!
+                     this
+                     total
+             )
+             = (
+                 JOIN!
+                     - (
+                         Process
+                         JOIN!
+                             this
+                             p
+                     )
+                     ' (
+                         reg
+                     )
+                 JOIN!
+                     - (
+                         Process
+                         JOIN!
+                             this
+                             p
+                     )
+                     reg
+             )
+         )
+     )
+}
+pred incr.incr{
+     NOOP (
+         AND (
+             = (
+                 JOIN!
+                     this
+                     total
+                 CONST 0
+             )
+             = (
+                 JOIN!
+                     this
+                     pc
+                 -> (
+                     Process
+                     lda
+                 )
+             )
+             always (
+                 OR (
+                     JOIN!
+                         this
+                         sta
+                     JOIN!
+                         this
+                         Done
+                     JOIN!
+                         this
+                         lda
+                     JOIN!
+                         this
+                         inc
+                 )
+             )
+             eventually (
+                 = (
+                     JOIN!
+                         this
+                         pc
+                     -> (
+                         Process
+                         Done
+                     )
+                 )
+             )
+         )
+     )
+}
+pred run$1{
+     NOOP (
+         AND (
+             JOIN!
+                 incr
+                 incr
+             eventually (
+                 > (
+                     JOIN!
+                         incr
+                         total
+                     CONST 1
+                 )
+             )
+         )
+     )
+}

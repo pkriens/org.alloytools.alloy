@@ -9,10 +9,11 @@ import edu.mit.csail.sdg.alloy4.ErrorWarning;
 import edu.mit.csail.sdg.alloy4.Pos;
 
 public final class Assert extends Expr implements Clause {
-    public final Expr expr;
-    public final Pos labelPos;
+
+    public final Expr   expr;
+    public final Pos    labelPos;
     public final String label;
-    
+
     public Assert(Pos pos, Pos labelPos, String label, Expr expr) {
         super(pos, Type.FORMULA);
         this.expr = expr;
@@ -33,7 +34,7 @@ public final class Assert extends Expr implements Clause {
             for (int i = 0; i < indent; i++) {
                 out.append(' ');
             }
-            out.append( "assert ").append(label).append('\n');
+            out.append("assert ").append(label).append('\n');
         }
     }
 
@@ -61,4 +62,15 @@ public final class Assert extends Expr implements Clause {
     public List< ? extends Browsable> getSubnodes() {
         return Arrays.asList(expr);
     }
+
+    // allcall
+    public Assert(Assert x, String label, Expr expr) {
+        super(x);
+        this.expr = expr;
+        this.labelPos = x.pos;
+        this.label = label;
+    }
+
+
+
 }

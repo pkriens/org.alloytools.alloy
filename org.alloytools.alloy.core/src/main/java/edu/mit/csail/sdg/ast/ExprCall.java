@@ -458,4 +458,14 @@ public final class ExprCall extends Expr {
     public Clause referenced() {
         return super.referenced(fun);
     }
+
+    // allcall
+    public ExprCall(ExprCall x, Collection<Expr> args) {
+        super(x);
+        this.fun = x.fun;
+        this.extraWeight = x.extraWeight;
+        this.args = ConstList.make(args);
+    }
+
+
 }

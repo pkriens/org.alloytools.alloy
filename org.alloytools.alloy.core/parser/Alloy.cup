@@ -26,6 +26,7 @@ package edu.mit.csail.sdg.parser;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.TreeSet;
 import java.util.Map;
@@ -59,6 +60,8 @@ import edu.mit.csail.sdg.ast.ExprUnary;
 import edu.mit.csail.sdg.ast.ExprVar;
 import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.PrimSig;
+import org.alloytools.alloy.algorithms.Algorithm;
+import org.alloytools.alloy.algorithms.Statement;
 
 // @modified [electrum] added temporal operators to the AST (unary temporal operators
 //			 have the same precedence as other unary operators, binary ones have the
@@ -245,6 +248,16 @@ parser code {:
     ch.put(CompSym.TRCSEQ, ";");
     ch.put(CompSym.PRIME, "'");
     ch.put(CompSym.TIME, "steps");
+    
+    ch.put(CompSym.WHILE, "while"); // pkriens
+    ch.put(CompSym.SKIP, "skip"); // pkriens
+    ch.put(CompSym.GOTO, "goto"); // pkriens
+    ch.put(CompSym.WITH, "with"); // pkriens
+    ch.put(CompSym.REQUIRE, "require"); // pkriens
+    ch.put(CompSym.ALGORITHM, "algorithm"); // pkriens
+    ch.put(CompSym.IF, "if"); // pkriens
+    
+    
     TreeSet<String> list = new TreeSet<String>();
     Pos p=Pos.UNKNOWN;
     if (x!=null && x.value instanceof Pos) p=(Pos)(x.value);
@@ -615,6 +628,24 @@ nonterminal Pos                        Vis;
 nonterminal Expr                       TempBinaryA;
 nonterminal Expr                       TempBinaryB;
 nonterminal Expr                       ExprNoSeq;
+
+//<allcall>
+nonterminal                        Algorithm; // pkriens
+terminal Pos ALGORITHM;        // name { ... }  pkriens  
+terminal Pos SKIP;        // pkriens  
+terminal Pos WHILE;        // pkriens  
+terminal Pos GOTO;        // pkriens  
+terminal Pos IF;       // pkriens
+terminal Pos ASSIGN;       // pkriens
+nonterminal Expr                   OptProcess;
+nonterminal List<Statement>        Clause;
+nonterminal List<Statement>        Statements;
+nonterminal Statement              Statement;
+nonterminal List<Decl>             OptDecls;
+nonterminal Expr                   Lvar;
+terminal Pos WITH;
+terminal Pos REQUIRE;
+//</allcall>
 
 precedence right TRCSEQ;
 precedence nonassoc BAR;
@@ -1157,3 +1188,30 @@ BaseExpr ::= LBRACE:o Declz:a SuperOrBar:b RBRACE:c {: RESULT = ExprQt.Op.COMPRE
 BaseExpr ::= LBRACE:o Declz:a              RBRACE:c {: RESULT = ExprQt.Op.COMPREHENSION.make(o, c, a, ExprConstant.TRUE); :};
 
 //=============================================================================
+
+// pkriens 
+
+Spec ::= Spec Algorithm       ; // pkriens
+Algorithm ::= ALGORITHM      ID:id  OptDecls:d OptProcess:p Clause:body               {: Algorithm.c(parser.alloymodule).algorithm(id.label,d,body,p);     :};
+OptDecls  ::= | LBRACKET Decls:d RBRACKET                                             {: RESULT = d; :};
+OptProcess::= | COLON Expr:e                                                          {: RESULT = e; :};
+Clause    ::= LBRACE Statements:l RBRACE                                              {: RESULT = l; :};
+Clause    ::= LBRACE RBRACE                                                           {: RESULT = Collections.emptyList(); :};
+
+Statements::= Statement:s                                                             {: RESULT = java.util.Arrays.asList(s); :}; 
+Statements::= Statements:l Statement:s                                                {: RESULT = Algorithm.c(parser.alloymodule).statements(l,s); :};          
+
+Statement ::= WHILE  LPAREN Expr:cond RPAREN  Clause:body                             {: RESULT = Algorithm.c(parser.alloymodule).while_(cond,body);    :};
+Statement ::= IF LPAREN Expr:cond RPAREN Clause:ifTrue                                {: RESULT = Algorithm.c(parser.alloymodule).ifThen(cond,ifTrue);             :};
+Statement ::= IF LPAREN Expr:cond RPAREN Clause:ifTrue ELSE Clause:ifFalse            {: RESULT = Algorithm.c(parser.alloymodule).ifThenElse(cond,ifTrue,ifFalse);             :};
+Statement ::= SKIP                                                                    {: RESULT = Algorithm.c(parser.alloymodule).skip();                :};
+Statement ::= Lvar:lvar ASSIGN Expr:value                                             {: RESULT = Algorithm.c(parser.alloymodule).assignment(lvar, value); :};
+Statement ::= GOTO ID:id                                                              {: RESULT = Algorithm.c(parser.alloymodule).goto_(id.label);             :};
+Statement ::= ID:id COLON                                                             {: RESULT = Algorithm.c(parser.alloymodule).label(id.label);      :};
+Statement ::= ASSERT ID:n Expr:e                                                      {: RESULT = Algorithm.c(parser.alloymodule).assert_(n.label,e); :};
+Statement ::= WITH  Declp:a Clause:b                                                  {: RESULT = Algorithm.c(parser.alloymodule).with(a,b); :};
+Statement ::= REQUIRE  Expr:e                                                         {: RESULT = Algorithm.c(parser.alloymodule).require(e); :};
+
+Lvar     ::= ID:n                                                                     {: RESULT = n; :};
+Lvar     ::= Lvar:j DOT Name:n                                                        {: RESULT = Algorithm.c(parser.alloymodule).lvar(j, n.label); :};
+Lvar     ::= Lvar:j LBRACKET Lvar:i RBRACKET                                          {: RESULT = Algorithm.c(parser.alloymodule).lvar(j, i); :};

@@ -1,0 +1,4 @@
+-includeresource         @jars/antlr-4.13.2-complete.jar
+
+Main-Class          org.antlr.v4.Tool
+-exportcontents:    *

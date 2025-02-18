@@ -28,3 +28,6 @@ org.osgi:osgi.annotation:8.0.1
 jline:jline:2.14.6
 org.assertj:assertj-core:3.24.2
 org.awaitility:awaitility:4.2.0
+
+org.antlr:antlr4:4.13.2
+org.antlr:antlr4-runtime:4.13.2

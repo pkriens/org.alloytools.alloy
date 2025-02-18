@@ -1,0 +1,17 @@
+src=src/gen/java, ${^src}
+
+-buildpath \
+    org.antlr.antlr4-runtime;version=latest
+    
+-testpath: \
+    biz.aQute.wrapper.junit, \
+    biz.aQute.wrapper.hamcrest, \
+    assertj-core
+    
+-generate: \
+    src/main/antlr/Alloy.g4; \
+        output=src/gen/java; \
+        classpath="org.alloytools.alloy.wrappers.antlr"; \
+        generate= \
+            "org.antlr.v4.Tool -o src/gen/java/org/alloytools/alloy/parser -Xexact-output-dir -package org.alloytools.alloy.parser src/main/antlr/Alloy.g4 2>out 1>out"
+ 

@@ -1,0 +1,1 @@
+warning(154): Alloy.g4:23:0: rule commandDecl contains an optional block with at least one alternative that can match an empty string

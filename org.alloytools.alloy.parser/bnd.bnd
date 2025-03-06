@@ -1,7 +1,10 @@
 src=src/gen/java, ${^src}
 
--buildpath \
-    org.antlr.antlr4-runtime;version=latest
+-buildpath: \
+	org.antlr.antlr4-runtime;version=latest,\
+	org.alloytools.api,\
+	aQute.libg,\
+	osgi.annotation
     
 -testpath: \
     biz.aQute.wrapper.junit, \

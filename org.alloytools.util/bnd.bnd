@@ -1,0 +1,12 @@
+Bundle-Description: \
+    Utilities based on a standard VM (no external dependencies) that can be used by all Alloytools \
+    code. 
+    
+-buildpath: \
+	aQute.libg,\
+	osgi.annotation
+    
+-testpath: \
+    biz.aQute.wrapper.junit, \
+    biz.aQute.wrapper.hamcrest, \
+    assertj-core

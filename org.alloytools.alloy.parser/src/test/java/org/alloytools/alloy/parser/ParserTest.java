@@ -133,6 +133,13 @@ public class ParserTest {
 		test("a + b - c - d", "(((a + b) - c) - d)", AlloyParser::value);
 
 	}
+	
+	
+	@Test
+	public void testDecl() {
+		test("a : disj one A", "", AlloyParser::decl);		
+		
+	}
 
 	@Test
 	public void testValue() {
@@ -204,7 +211,7 @@ public class ParserTest {
 
 		test("~a+b", "((~ a) + b)", AlloyParser::value);
 		test("a+~b", "(a + (~ b))", AlloyParser::value);
-		test("some a no b", "(((some a) (no b)))", AlloyParser::macro);
+		test("some a no b", "(((some a) (no b)))", AlloyParser::expr);
 		
 
 		testFormula("p => q => r", "(p => (q => r))");
@@ -227,7 +234,7 @@ public class ParserTest {
 	}
 
 	void testMacro(String source, String expected) {
-		test(source, expected, AlloyParser::macro);
+		test(source, expected, AlloyParser::expr);
 	}
 
 	void test(String source, String expected, Function<AlloyParser, ? extends ParseTree> getter, String... ignores) {
@@ -255,6 +262,7 @@ public class ParserTest {
 		});
 		CommonTokenStream tokens = new CommonTokenStream(al);
 		AlloyParser parser = new AlloyParser(tokens);
+		parser.addParseListener(new AlloyBaseListener());
 		parser.setTrace(true);
 		ParseTree tree = getter.apply(parser);
 		if ( found.get() > 0)

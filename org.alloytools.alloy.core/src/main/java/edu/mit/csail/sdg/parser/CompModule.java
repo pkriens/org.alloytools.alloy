@@ -819,7 +819,7 @@ public final class CompModule extends Browsable implements Module {
      * @param filename - the filename corresponding to this module
      * @param path - one of the path pointing to this module
      */
-    CompModule(CompModule world, String filename, String path) throws Err {
+    public CompModule(CompModule world, String filename, String path) throws Err {
         if (world == null) {
             if (path.length() > 0)
                 throw new ErrorFatal("Root module misparsed by parser.");
@@ -1776,7 +1776,8 @@ public final class CompModule extends Browsable implements Module {
     }
 
     /**
-     * Return an unmodifiable list containing all functions defined in this module or a reachable submodule.
+     * Return an unmodifiable list containing all functions defined in this module
+     * or a reachable submodule.
      */
     @Override
     public SafeList<Func> getAllReachableUserDefinedFunc() {

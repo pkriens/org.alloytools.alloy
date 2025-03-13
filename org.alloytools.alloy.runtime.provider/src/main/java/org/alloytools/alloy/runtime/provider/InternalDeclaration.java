@@ -7,7 +7,7 @@ import org.alloytools.alloy.builder.api.Pos;
 import org.alloytools.alloy.model.api.Environment;
 import org.alloytools.alloy.model.api.Multiplicity;
 import org.alloytools.alloy.model.api.TDeclaration;
-import org.alloytools.alloy.model.api.TSig;
+import org.alloytools.alloy.model.api.TType;
 import org.alloytools.alloy.model.api.TValue;
 
 public class InternalDeclaration implements TDeclaration {
@@ -58,17 +58,7 @@ public class InternalDeclaration implements TDeclaration {
 		
 	}
 	@Override
-	public int arity() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	@Override
-	public TSig at(int i) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public TSig[] slice(int start, int end, TSig... append) {
+	public Pos<TType> where() {
 		// TODO Auto-generated method stub
 		return null;
 	}

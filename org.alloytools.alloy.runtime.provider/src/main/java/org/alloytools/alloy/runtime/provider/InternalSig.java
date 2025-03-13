@@ -1,6 +1,7 @@
 package org.alloytools.alloy.runtime.provider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.alloytools.alloy.builder.api.ModuleBuilder.SigDecl;
@@ -35,11 +36,6 @@ class InternalSig implements TSig, Internal {
 		return name;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public List<TDeclaration> fields() {
-		return (List)declarations;
-	}
 
 	@Override
 	public Optional<TFormula> block() {
@@ -59,6 +55,18 @@ class InternalSig implements TSig, Internal {
 
 	@Override
 	public TType type() {
+		return null;
+	}
+
+	@Override
+	public Pos<TType> where() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, TDeclaration> fields() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

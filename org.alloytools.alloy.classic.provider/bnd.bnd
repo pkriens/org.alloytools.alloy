@@ -11,6 +11,6 @@ Bundle-Description: \
 	aQute.libg
 
 -testpath: \
-    osgi.enroute.junit.wrapper;version=4.12, \
-    osgi.enroute.hamcrest.wrapper;version=1.3
+    biz.aQute.wrapper.hamcrest;version=latest,\
+    biz.aQute.wrapper.junit;version=latest
 

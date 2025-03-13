@@ -16,6 +16,7 @@ import org.alloytools.alloy.model.api.TModule;
 import org.alloytools.alloy.model.api.TPred;
 import org.alloytools.alloy.model.api.TRun;
 import org.alloytools.alloy.model.api.TSig;
+import org.alloytools.alloy.model.api.TType;
 import org.alloytools.alloy.model.api.Typed;
 import org.alloytools.alloy.model.api.UserMessage;
 
@@ -145,5 +146,12 @@ public class InternalModule implements TModule, Environment {
 	public void add(InternalCommand command) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public TType INT() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

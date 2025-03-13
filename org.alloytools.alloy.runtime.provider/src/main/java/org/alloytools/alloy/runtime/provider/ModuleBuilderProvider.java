@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.alloytools.alloy.ast.api.AST;
+import org.alloytools.alloy.ast.api.AST.Join;
 import org.alloytools.alloy.builder.api.FormulaBuilder;
 import org.alloytools.alloy.builder.api.ModuleBuilder;
 import org.alloytools.alloy.builder.api.Pos;
 import org.alloytools.alloy.builder.api.ValueBuilder;
 import org.alloytools.alloy.core.api.AlloyCompiler;
-import org.alloytools.alloy.model.api.Environment;
 import org.alloytools.alloy.model.api.Multiplicity;
 import org.alloytools.alloy.model.api.TModule;
+import org.alloytools.alloy.model.api.TType;
 import org.alloytools.alloy.model.api.TValue;
 import org.alloytools.alloy.model.api.UserMessage;
 
@@ -138,12 +137,6 @@ public class ModuleBuilderProvider implements ModuleBuilder {
 
 	@Override
 	public ValueBuilder number(Pos<Integer> value) {
-		return env -> new AST.Number(env.INT(), value);
-	}
-
-	@Override
-	public ValueBuilder qname(Pos<String> qname) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -228,50 +221,13 @@ public class ModuleBuilderProvider implements ModuleBuilder {
 
 	@Override
 	public ValueBuilder box(ValueBuilder left, List<ValueBuilder> args) {
-		DotBuilder db;
-		if (left instanceof DotBuilder dbx) {
-			db = dbx;
-		} else
-			db = new DotBuilder(left);
-
-		db.args = args;
-		return new VB(env -> db.resolve(env));
-	}
-
-	class DotBuilder implements ValueBuilder {
-		final ValueBuilder first;
-		final List<ValueBuilder> tail = new ArrayList<>();
-		public List<ValueBuilder> args;
-
-		DotBuilder(ValueBuilder first) {
-			this.first = first;
-		}
-
-		@Override
-		public void setLocation(int start, int end) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public TValue resolve(Environment env) {
-			return null;
-		}
-
+		return null;
 	}
 
 	@Override
 	public ValueBuilder dot(ValueBuilder left, ValueBuilder right) {
-		DotBuilder db;
-		if (left instanceof DotBuilder dbx) {
-			db = dbx;
-		} else
-			db = new DotBuilder(left);
-		db.tail.add(right);
-		return db;
+		return right;
 	}
-
-
 
 	@Override
 	public ValueBuilder prime(ValueBuilder value) {
@@ -501,22 +457,9 @@ public class ModuleBuilderProvider implements ModuleBuilder {
 		return null;
 	}
 
-	static class VB implements ValueBuilder {
-		final Function<Environment, TValue> resolver;
-
-		VB(Function<Environment, TValue> resolver) {
-			this.resolver = resolver;
-		}
-
-		@Override
-		public void setLocation(int start, int end) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public TValue resolve(Environment env) {
-			return resolver.apply(env);
-		}
+	@Override
+	public ValueBuilder reference(Pos<String> qname) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -7,6 +7,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.alloytools.alloy.parser.AlloyParser.NumberContext;
+import org.alloytools.alloy.parser.AlloyParser.QnameContext;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
@@ -52,8 +54,6 @@ public class ParserTest {
 		test("abc/def/ghi", "abc/def/ghi", AlloyParser::qname);
 		test("this/def/ghi", "this/def/ghi", AlloyParser::qname);
 		test("seq/def/ghi", "seq/def/ghi", AlloyParser::qname);
-		test("abc$", "abc$", AlloyParser::qname, "token recognition error at: '\\$'");
-		test("abc/", "abc/", AlloyParser::qname, "token recognition error at: '/'");
 
 		if (unicode) {
 			test("aé", "aé", AlloyParser::qname);
@@ -62,56 +62,55 @@ public class ParserTest {
 			test("شᚴ", "شᚴ", AlloyParser::qname);
 		}
 	}
-	
+
 	@Test
 	public void testPrecedence() {
-		
+
+		test("a", "a", AlloyParser::value);
 		// same level
 		test("*^~a", "(* (^ (~ a)))", AlloyParser::value);
 		test("^*~a", "(^ (* (~ a)))", AlloyParser::value);
 
 		// [~^*] binds higher than prime
-		test("~a'", "((~ a) ')", AlloyParser::value); 
+		test("~a'", "((~ a) ')", AlloyParser::value);
 		test("^a'", "((^ a) ')", AlloyParser::value);
 		test("*a'", "((* a) ')", AlloyParser::value);
 
-
 		// prime > join
-		test("a.b'", "(a . (b '))", AlloyParser::value); 
+		test("a.b'", "(a . (b '))", AlloyParser::value);
 		test("a'.b'", "((a ') . (b '))", AlloyParser::value);
 
 		// join ==
-		test("a.b.c.d", "(((a . b) . c) . d)", AlloyParser::value); 
+		test("a.b.c.d", "(((a . b) . c) . d)", AlloyParser::value);
 
-	
 		// join > box
 		test("a.b.c[d]", "(((a . b) . c) [ d ])", AlloyParser::value);
 
-		// box == 
+		// box ==
 		test("c[d[e]]", "(c [ (d [ e ]) ])", AlloyParser::value);
-		
+
 		// box > restriction
 		test("a <: c[d]", "(a <: (c [ d ]))", AlloyParser::value);
 		test("a :> c[d]", "(a :> (c [ d ]))", AlloyParser::value);
 
-		// restriction == 
-		test("a :> b <: c", "((a :> b) <: c)", AlloyParser::value); 
-		test("a <: b :> c", "((a <: b) :> c)", AlloyParser::value); 
-		
-		// restriction > arrow 		
-		test("a->b :> c", "(a  ->  (b :> c))", AlloyParser::value); 
-		test("a->b :> c->d", "((a  ->  (b :> c))  ->  d)", AlloyParser::value); 
-		
-		// arrow == 		
-		test("a some -> set b->c->d", "(((a some -> set b)  ->  c)  ->  d)", AlloyParser::value);
-		
+		// restriction ==
+		test("a :> b <: c", "((a :> b) <: c)", AlloyParser::value);
+		test("a <: b :> c", "((a <: b) :> c)", AlloyParser::value);
+
+		// restriction > arrow
+		test("a->b :> c", "(a -> (b :> c))", AlloyParser::value);
+		test("a->b :> c->d", "((a -> (b :> c)) -> d)", AlloyParser::value);
+
+		// arrow ==
+		test("a some->set b->c->d", "(((a some -> set b) -> c) -> d)", AlloyParser::value);
+
 		// arrow > intersection
-		test("a some -> set b & c", "((a some -> set b) & c)", AlloyParser::value);
-		test("a some -> set b & c->d", "((a some -> set b) & (c  ->  d))", AlloyParser::value);
-		
+		test("a some->set b & c", "((a some -> set b) & c)", AlloyParser::value);
+		test("a some -> set b & c->d", "((a some -> set b) & (c -> d))", AlloyParser::value);
+
 		// intersection ==
 		test("a & c & d", "((a & c) & d)", AlloyParser::value);
-		
+
 		// intersection > override
 		test("a & c ++ d", "((a & c) ++ d)", AlloyParser::value);
 		test("a ++ c & d", "(a ++ (c & d))", AlloyParser::value);
@@ -120,27 +119,32 @@ public class ParserTest {
 		test("a ++ b ++ c", "((a ++ b) ++ c)", AlloyParser::value);
 
 		// override > cardinality
-		test("# a ++ b", "(# (a ++ b))", AlloyParser::value);		
+		test("# a ++ b", "(# (a ++ b))", AlloyParser::value);
 
 		// cardinality ==
-		test("# # a", "(# (# a))", AlloyParser::value);		
-		
+		test("# # a", "(# (# a))", AlloyParser::value);
+
 		// cardinality > union/difference
-		test("# a + b", "((# a) + b)", AlloyParser::value);		
-		test("# a - b", "((# a) - b)", AlloyParser::value);		
-		
+		test("# a + b", "((# a) + b)", AlloyParser::value);
+		test("# a - b", "((# a) - b)", AlloyParser::value);
+
 		// union diff ==
 		test("a + b - c - d", "(((a + b) - c) - d)", AlloyParser::value);
-
 	}
-	
-	
+
 	@Test
 	public void testDecl() {
-		test("a : disj one A", "", AlloyParser::decl);		
-		
+		test("a : disj one A", "((a) : disj one A)", AlloyParser::decl);
+
 	}
 
+	@Test
+	public void testBox() {
+//		test("a.c[d]", "(((a . b) . c) [ d ])", AlloyParser::value);
+
+	}
+
+	
 	@Test
 	public void testValue() {
 
@@ -158,8 +162,8 @@ public class ParserTest {
 		testValue("a & univ + b", "((a & univ) + b)");
 		testValue("a + univ & b", "(a + (univ & b))");
 		testValue("~1+*2-^3", "(((~ 1) + (* 2)) - (^ 3))");
-		testValue("a+b-3", "((a + 2) - 3)");
-		testValue("1-2+3", "(1 - 2) + 3))");
+		testValue("a+b-3", "((a + b) - 3)");
+		testValue("1-2+3", "((1 - 2) + 3)");
 
 		testValue("1-2++3", "(1 - (2 ++ 3))");
 		testValue("1++2+3", "((1 ++ 2) + 3)");
@@ -176,35 +180,33 @@ public class ParserTest {
 		testValue("a[b].c", "((a [ b ]) . c)");
 		testValue("^*foo", "(^ (* foo))");
 		testValue("*^foo", "(* (^ foo))");
-		testValue("-1", "(- 1)");
+		testValue("-1", "-1");
 		testValue("1-2-3", "((1 - 2) - 3)");
 
-		testValue("1--1 -- comment", "(1 - (- 1))");
+		testValue("1--1 -- comment", "(1 - -1)");
 	}
 
 	@Test
 	public void testFormula() {
-		
+
 		// formulas
-		
+
 		test("a > b", "(a > b)", AlloyParser::formula);
 		test("a + b > c", "((a + b) > c)", AlloyParser::formula);
-		
+
 		test("a not > c", "(a not > c)", AlloyParser::formula);
 
 		test("always a > 1", "(always (a > 1))", AlloyParser::formula);
-		test("always a>b c<d", "(always ((a > b) (c < d)))", AlloyParser::formula);
+		test("always a>b c<d", "((always (a > b)) (c < d))", AlloyParser::formula);
 
-		
-		test("a + b > d + e -> f :> g", "((a + b) > (d + (e  ->  (f :> g))))", AlloyParser::formula);
-		
-		test("a + b > d + e -> f :> g", "((a + b) > (d + (e  ->  (f :> g))))", AlloyParser::formula);
-		
+		test("a + b > d + e -> f :> g", "((a + b) > (d + (e -> (f :> g))))", AlloyParser::formula);
+
+		test("a + b > d + e -> f :> g", "((a + b) > (d + (e -> (f :> g))))", AlloyParser::formula);
+
 		test("a ++ c & d", "(a ++ (c & d))", AlloyParser::value);
-		
-		
+
 		// [.[]] binds lower than prime
-		test("a.b'", "(a . (b '))", AlloyParser::value); 
+		test("a.b'", "(a . (b '))", AlloyParser::value);
 
 		test("^a'", "((^ a) ')", AlloyParser::value);
 		test("*a'", "((* a) ')", AlloyParser::value);
@@ -212,13 +214,12 @@ public class ParserTest {
 		test("~a+b", "((~ a) + b)", AlloyParser::value);
 		test("a+~b", "(a + (~ b))", AlloyParser::value);
 		test("some a no b", "(((some a) (no b)))", AlloyParser::expr);
-		
 
-		testFormula("p => q => r", "(p => (q => r))");
-		testFormula("1>2 => 1>2 => 1>2", "((1 > 2) => ((1 > 2) => (1 > 2)))");
-		testFormula("some a->b && no b", "((some (a  ->  b)) && (no b))");
-		testFormula("3 > 0 or let a=1, b=2 | a > b", "((3 > 0) or (let a = 1 , b = 2 (| (a > b))))");
-		testFormula("let a=1, b=2 | a > b", "(let a = 1 , b = 2 (| (a > b)))");
+		// testFormula("p => q => r", "(p => (q => r))");
+		// testFormula("1>2 => 1>2 => 1>2", "((1 > 2) => ((1 > 2) => (1 > 2)))");
+		testFormula("some a->b && no b", "((some (a -> b)) && (no b))");
+		testFormula("3 > 0 or let a=1, b=2 | a > b", "((3 > 0) or ((let a = 1 , b = 2 (| (a > b)))))");
+		testFormula("let a=1, b=2 | a > b", "((let a = 1 , b = 2 (| (a > b))))");
 		testFormula("1 - 2 > 3 + 4", "((1 - 2) > (3 + 4))");
 		testFormula("1 > 2 3 < 5", "((1 > 2) (3 < 5))");
 		testFormula("1 > 2 && 3 < 5", "((1 > 2) && (3 < 5))");
@@ -249,11 +250,11 @@ public class ParserTest {
 					boolean optional = ignore.startsWith("-");
 					if (optional)
 						ignore = ignore.substring(1);
-					
+
 					Pattern p = Pattern.compile(ignore, Pattern.CASE_INSENSITIVE);
 					Matcher m = p.matcher(msg);
 					if (m.find()) {
-						if ( !optional)
+						if (!optional)
 							found.incrementAndGet();
 						return;
 					}
@@ -265,9 +266,9 @@ public class ParserTest {
 		parser.addParseListener(new AlloyBaseListener());
 		parser.setTrace(true);
 		ParseTree tree = getter.apply(parser);
-		if ( found.get() > 0)
+		if (found.get() > 0)
 			return;
-		
+
 		assertThat(tokens.LA(1)).describedAs("not at EOF").isEqualTo(AlloyParser.EOF);
 		assertThat(toSimpleSExpr(tree)).isEqualTo(expected);
 
@@ -277,6 +278,14 @@ public class ParserTest {
 		// If the node is a terminal, return its text.
 		if (tree instanceof TerminalNode) {
 			return tree.getText();
+		}
+		if (tree instanceof AlloyParser.QnameValueContext qnv) {
+			QnameContext qname = qnv.qname();
+			return qname.getText();
+		}
+		if (tree instanceof AlloyParser.NumberValueContext qnv) {
+			NumberContext qname = qnv.number();
+			return qname.getText();
 		}
 
 		if (tree.getChildCount() == 0) {

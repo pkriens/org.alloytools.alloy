@@ -206,4 +206,5 @@ public interface AST {
 
     record ImpliesFormula(Pos<TType> where, TFormula condition, TFormula then, TFormula else_) implements TFormula {
     }
+
 }

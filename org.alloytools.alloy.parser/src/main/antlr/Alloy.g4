@@ -24,7 +24,8 @@ funDecl         : 'fun' ( qname '.')  name arguments? ':' multiplicity? value va
 assertDecl      : 'assert' name? block ;
 macroDecl       : 'let' name ( '[' names ']' )? '='? expr ;
 
-value           : ('~'|'^'|'*') value                                               # unaryOpValue
+value           : qname                                                             # qnameValue
+                | ('~'|'^'|'*') value                                               # unaryOpValue
                 | value '\''                                                        # primeValue
                 | value '.' value                                                   # joinValue
                 | value '[' value (',' value)* ']'                                  # boxJoinValue
@@ -41,7 +42,6 @@ value           : ('~'|'^'|'*') value                                           
                 | '{' value '}'                                                     # parenthesisValue                
                 | '@' name                                                          # atnameValue
                 | qname '$'                                                         # metaValue 
-                | qname                                                             # qnameValue //  
                 | number                                                            # numberValue
                 ;
                   
@@ -110,7 +110,7 @@ exactly         : 'exactly' ;
 
 ID              : [\p{L}\p{Lo}_%][\p{L}\p{Lo}_"0-9%]*;
 PRIMITIVE       : ('fun'|'ord'|'seq') '/' ID ;
-QNAME           : ID ( '/' ID )+ ;
+QNAME           : ID ( '/' ID )* ;
 NUMBER          : [0-9]+ | '0x' [0-9A-Fa-f]+ | '0b' [10]+ ;
 STRING_LITERAL  : '"' ( ~["\\] | '\\' . )* '"' ;
 WS              : [ \t\r\n]+ -> skip ;

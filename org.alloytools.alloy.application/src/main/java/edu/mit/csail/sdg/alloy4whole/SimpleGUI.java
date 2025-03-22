@@ -1849,6 +1849,7 @@ public final class SimpleGUI implements ComponentListener, Listener {
             }
             try {
                 Expr e = CompUtil.parseOneExpression_fromString(root, strs[0]);
+                System.out.println("type = " + e.type());
                 if (AlloyCore.isDebug() && VerbosityPref.get() == Verbosity.FULLDEBUG) {
                     SimInstance simInst = convert(root, ans);
                     if (simInst.wasOverflow())

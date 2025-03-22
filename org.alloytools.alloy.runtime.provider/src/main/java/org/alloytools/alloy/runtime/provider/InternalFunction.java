@@ -25,8 +25,8 @@ class InternalFunction implements TFun, Internal {
 		this.name = funDecl.name().get();
 		this.formalArguments = funDecl.formalArgs().stream().map(decl -> new InternalDeclaration(module, decl))
 				.toList();
-		this.domain = new LazyResolve<>(env -> funDecl.domain().resolve(env));
-		this.body = new LazyResolve<>(env -> funDecl.body().resolve(env));
+		this.domain = new LazyResolve<>(env -> env.resolve(funDecl.domain()));
+		this.body = new LazyResolve<>(env -> env.resolve(funDecl.body()));
 	}
 
 

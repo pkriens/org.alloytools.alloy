@@ -386,4 +386,16 @@ public final class Func extends Expr implements Clause {
         return 1;
     }
 
+    public String toString(String prefix) {
+        StringBuilder sb = new StringBuilder();
+        if (isPred) {
+            sb.append("pred ");
+        } else {
+            sb.append("fun ");
+        }
+        sb.append(prefix).append(label).append(decls);
+        sb.append(" : ").append(returnDecl.type());
+        return sb.toString();
+    }
+
 }

@@ -8,5 +8,4 @@ import org.alloytools.alloy.model.api.TValue;
 public interface ValueBuilder extends ExprBuilder {
 
     List<TValue> resolve(Environment env);
-
 }

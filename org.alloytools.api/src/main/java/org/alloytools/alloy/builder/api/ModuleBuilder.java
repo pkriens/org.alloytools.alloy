@@ -202,6 +202,4 @@ public interface ModuleBuilder {
 
     FormulaBuilder pred(Pos<String> qname, List<Pos<String>> arguments);
 
-
-
 }

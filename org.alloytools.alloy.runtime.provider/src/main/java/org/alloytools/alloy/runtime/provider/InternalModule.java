@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alloytools.alloy.builder.api.ModuleBuilder.ModuleDecl;
+import org.alloytools.alloy.builder.api.ValueBuilder;
 import org.alloytools.alloy.model.api.Environment;
 import org.alloytools.alloy.model.api.TCheck;
 import org.alloytools.alloy.model.api.TCommand;
@@ -17,6 +18,7 @@ import org.alloytools.alloy.model.api.TPred;
 import org.alloytools.alloy.model.api.TRun;
 import org.alloytools.alloy.model.api.TSig;
 import org.alloytools.alloy.model.api.TType;
+import org.alloytools.alloy.model.api.TValue;
 import org.alloytools.alloy.model.api.Typed;
 import org.alloytools.alloy.model.api.UserMessage;
 
@@ -151,6 +153,12 @@ public class InternalModule implements TModule, Environment {
 
 	@Override
 	public TType INT() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public TValue resolve(ValueBuilder value) {
 		// TODO Auto-generated method stub
 		return null;
 	}

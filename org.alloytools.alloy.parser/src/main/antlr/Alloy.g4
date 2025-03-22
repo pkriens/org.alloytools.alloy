@@ -24,7 +24,9 @@ funDecl         : 'fun' ( qname '.')  name arguments? ':' multiplicity? value va
 assertDecl      : 'assert' name? block ;
 macroDecl       : 'let' name ( '[' names ']' )? '='? expr ;
 
-value           : qname                                                             # qnameValue
+value           : value '.' qname ('[' value (',' value)* ']')?                     # boxValue
+                | qname '[' value (',' value)* ']'                                  # boxValue
+                | qname                                                             # qnameValue
                 | ('~'|'^'|'*') value                                               # unaryOpValue
                 | value '\''                                                        # primeValue
                 | value '.' value                                                   # joinValue

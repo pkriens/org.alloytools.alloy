@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.alloytools.alloy.ast.api.AST.Join;
 import org.alloytools.alloy.builder.api.FormulaBuilder;
 import org.alloytools.alloy.builder.api.ModuleBuilder;
 import org.alloytools.alloy.builder.api.Pos;
@@ -13,8 +12,6 @@ import org.alloytools.alloy.builder.api.ValueBuilder;
 import org.alloytools.alloy.core.api.AlloyCompiler;
 import org.alloytools.alloy.model.api.Multiplicity;
 import org.alloytools.alloy.model.api.TModule;
-import org.alloytools.alloy.model.api.TType;
-import org.alloytools.alloy.model.api.TValue;
 import org.alloytools.alloy.model.api.UserMessage;
 
 import aQute.lib.collections.MultiMap;

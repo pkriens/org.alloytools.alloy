@@ -2385,7 +2385,7 @@ public final class CompModule extends Browsable implements Module {
                 }
                 if (resolution == 1) {
                     ch.add(fn == 0 ? ExprCall.make(pos, null, f, null, penalty) : ExprBadCall.make(pos, null, f, null, penalty));
-                    re.add((f.isPred ? "pred " : "fun ") + f.label);
+                    re.add(f.toString(""));
                 }
                 if (resolution == 2 && f != rootfunbody && THIS != null && fullname.charAt(0) != '@' && fn > 0 && f.get(0).type().intersects(THIS.type())) {
                     // If there is some value bound to "this", we should
@@ -2393,11 +2393,11 @@ public final class CompModule extends Browsable implements Module {
                     // call
                     ConstList<Expr> t = Util.asList(THIS);
                     ch.add(fn == 1 ? ExprCall.make(pos, null, f, t, 0) : ExprBadCall.make(pos, null, f, t, 0));
-                    re.add((f.isPred ? "pred this." : "fun this.") + f.label);
+                    re.add(f.toString("this."));
                 }
                 if (resolution != 1) {
                     ch.add(fn == 0 ? ExprCall.make(pos, null, f, null, 0) : ExprBadCall.make(pos, null, f, null, 0));
-                    re.add((f.isPred ? "pred " : "fun ") + f.label);
+                    re.add(f.toString(""));
                 }
             }
         }
@@ -2476,6 +2476,7 @@ public final class CompModule extends Browsable implements Module {
         }
         return null;
     }
+
 
     public Pos getGlobal(String key) {
         Pos result = getGlobalFromModule(this, key);

@@ -74,4 +74,5 @@ public interface TModule {
     List<String> formalArguments();
 
     String simpleName();
+
 }

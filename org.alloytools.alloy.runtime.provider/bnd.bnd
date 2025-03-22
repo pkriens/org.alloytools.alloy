@@ -1,3 +1,6 @@
 -buildpath: \
 	org.alloytools.api,\
 	aQute.libg
+-testpath: biz.aQute.wrapper.junit, \
+    biz.aQute.wrapper.hamcrest,\
+    assertj-core;version=latest
